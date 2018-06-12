@@ -3,7 +3,6 @@ $('#submit').on('click', function(e) {
     var name = $('#name').val(),
         email = $('#email').val(),
         phone = $('#phone').val();;
-    console.log(email);
     $.ajax({
         url: '/login.php',
         method: 'POST',
