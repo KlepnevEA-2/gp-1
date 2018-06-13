@@ -18,35 +18,49 @@ $prepare = $pdo->prepare('SELECT * FROM users2 where email = :uslovie1');
 $prepare->execute(['uslovie1' => $email]);
 $data = $prepare->fetch(PDO::FETCH_ASSOC);
 
+
 if ($data) {
-    $usersCount = $pdo->prepare("INSERT INTO users2 where email = $email (count) VALUES (:count)");
-    $usersCount->execute(['count' => $count]);
+    $countOrder = $pdo->prepare('SELECT * FROM users2 WHERE id = :id');
+    $countOrder->execute(['id' => $data['id']]);
+    $dataCount = $countOrder->fetch(PDO::FETCH_ASSOC);
+    $count = $dataCount['count'] + 1;
+
+    $countVal = $pdo->prepare("UPDATE users2 set count = :count where id=:id");
+    $countVal->bindParam(':id', $data['id']);
+    $countVal->bindParam(':count', $count);
+    $countVal->execute();
+
     echo json_encode($data);
 } else {
-    $users = $pdo->prepare("INSERT INTO users2 (name, email, tel, count) VALUES (:name, :mail, :phone)");
-    $users->execute(['name' => $name, 'mail' => $email, 'phone' => $phone]);
+    $users = $pdo->prepare("INSERT INTO users2 (name, email, tel, count) VALUES (:name, :mail, :phone, :count)");
+    $users->execute(['name' => $name, 'mail' => $email, 'phone' => $phone, 'count' => 1]);
     echo json_encode('Клиент зарегестрирован');
 }
 
-
 $orders = $pdo->prepare("INSERT INTO orders2 (street, home, part, appt, floor, comment) VALUES (:street, :home, :part, :appt, :floor, :comment)");
 $orders->execute(['street' => $street, 'home' => $home, 'part' => $part, 'appt' => $appt, 'floor' => $floor, 'comment' => $comment]);
+$insertId=$pdo->lastInsertId();
 
+$prepareOrder = $pdo->prepare('SELECT * FROM orders2 where id = :id');
+$prepareOrder->execute(['id' => $insertId]);
+$dataOrder = $prepareOrder->fetch(PDO::FETCH_ASSOC);
 
-$prepareOrder = $pdo->prepare('SELECT * FROM orders2');
-$prepareOrder->execute(['uslovie1' => $street]);
-$dataOrder = $prepareOrder->fetch(PDO::FETCH_OBJ);
-
+if($dataCount['count'] < 1) {
+    $text = "Спасибо - это ваш первый заказ";
+} else {
+    $text = 'Спасибо! Это уже ' . $count . ' заказ';
+}
 
 $mail_message = '
     <html>
     <head>
-        <title>Заказ №</title>
+        <title>Заказ № '.$dataOrder['id'].'</title>
     </head>
-        <h1>Заказ №</h1>
-        <p>“Ваш заказ будет доставлен по адресу: ' . $street . ', дом ' . $home . ', корпус '. $part .', квартира ' . $appt . ', этаж ' . $floor . '  </p>
+        <h1>Заказ №'.$dataOrder['id'].'</h1>
+        <p>Ваш заказ будет доставлен по адресу: ' .$dataOrder['street']. ', дом ' . $dataOrder['home'] . ', корпус '. $dataOrder['part'] .', квартира ' . $dataOrder['appt'] . ', этаж ' . $dataOrder['floor'] . '  </p>
+        <p>Коментарий: ' .$dataOrder['comment']. '</p>
         <p>Заказ: DarkBeefBurger за 500 рублей, 1 шт</p>
-        <p>Спасибо! Это уже 555 заказ</p>
+        <p>'. $text .'</p>
     </html>';
 
 $headers = "From: Администратор сайта <klepnev-ea@yandex.ru>\r\n".
