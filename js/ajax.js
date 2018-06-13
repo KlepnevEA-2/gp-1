@@ -2,7 +2,15 @@ $('#submit').on('click', function(e) {
     e.preventDefault();
     var name = $('#name').val(),
         email = $('#email').val(),
-        phone = $('#phone').val();;
+        phone = $('#phone').val();
+        street = $('#street').val();
+        home = $('#home').val();
+        part = $('#part').val();
+        appt = $('#appt').val();
+        floor = $('#floor').val();
+        comment = $('#comment').val();
+
+
     $.ajax({
         url: '/login.php',
         method: 'POST',
@@ -10,7 +18,13 @@ $('#submit').on('click', function(e) {
         data: {
             name: name,
             phone: phone,
-            email: email
+            email: email,
+            street: street,
+            home: home,
+            part: part,
+            appt: appt,
+            floor : floor,
+            comment: comment
         }
     }).done(function(data) {
         console.log(data);
