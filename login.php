@@ -1,19 +1,20 @@
 <?php
 
-$name = $_POST['name'];
-$phone = $_POST['phone'];
-$email = $_POST['email'];
+require "pdo.php";
 
-$street = $_POST['street'];
-$home = $_POST['home'];
-$part = $_POST['part'];
-$appt = $_POST['appt'];
-$floor = $_POST['floor'];
-$comment = $_POST['comment'];
+$name = (isset($_POST['name'])) ? trim($_POST['name']) : null;
+$phone = (isset($_POST['phone'])) ? trim($_POST['phone']) : null;
+$email = (isset($_POST['email'])) ? trim($_POST['email']) : null;
+$street = (isset($_POST['street'])) ? trim($_POST['street']) : null;
+$part = (isset($_POST['part'])) ? trim($_POST['part']) : null;
+$home = (isset($_POST['home'])) ? trim($_POST['home']) : null;
+$appt = (isset($_POST['appt'])) ? trim($_POST['appt']) : null;
+$floor = (isset($_POST['floor'])) ? trim($_POST['floor']) : null;
+$comment = (isset($_POST['comment'])) ? trim($_POST['comment']) : null;
 
 
-$dsn = "mysql:host=localhost;dbname=burgers2;charset=utf8";
-$pdo = new PDO($dsn, 'root', '');
+$dsn = "mysql:host=$pdoConfig->host;dbname=$pdoConfig->dbname;charset=utf8";
+$pdo = new PDO($dsn, $pdoConfig->username, $pdoConfig->password);
 $prepare = $pdo->prepare('SELECT * FROM users2 where email = :uslovie1');
 $prepare->execute(['uslovie1' => $email]);
 $data = $prepare->fetch(PDO::FETCH_ASSOC);
@@ -34,7 +35,7 @@ if ($data) {
 } else {
     $users = $pdo->prepare("INSERT INTO users2 (name, email, tel, count) VALUES (:name, :mail, :phone, :count)");
     $users->execute(['name' => $name, 'mail' => $email, 'phone' => $phone, 'count' => 1]);
-    echo json_encode('Клиент зарегестрирован');
+    echo json_encode($pdoConfig->username);
 }
 
 $orders = $pdo->prepare("INSERT INTO orders2 (street, home, part, appt, floor, comment) VALUES (:street, :home, :part, :appt, :floor, :comment)");

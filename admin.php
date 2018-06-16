@@ -1,11 +1,6 @@
 <?php
 
-$dsn = "mysql:host=localhost;dbname=burgers2;charset=utf8";
-$pdo = new PDO($dsn, 'root', '');
-//$prepare = $pdo->prepare('SELECT * FROM users2');
-//$prepare->execute();
-//$data = $prepare->fetch(PDO::FETCH_ASSOC);
-
+require "pdo.php";
 
 $stmt = $pdo->query("SELECT * FROM users2");
 $results = $stmt->fetch(PDO::FETCH_ASSOC);
